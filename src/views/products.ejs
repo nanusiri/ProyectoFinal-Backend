@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <h1>Lista de Productos</h1>
+
+    <button id="btnCarrito" style="margin-bottom: 10px; font-size: 20px;">
+        Ir al carrito
+    </button>
+
+
+    <!-- Controles de Filtrado, Paginación y Ordenamiento -->
+    <form action="/api/products" method="GET">
+        <label for="limit">Mostrar:</label>
+        <select name="limit" id="limit">
+            <option value="10" selected>10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+        </select>
+
+        <label for="sort">Orden precio:</label>
+        <select name="sort" id="sort">
+            <option value="asc">Ascendente</option>
+            <option value="desc">Descendente</option>
+        </select>
+
+        <label for="category">Categoría:</label>
+        <input type="text" name="category" id="category">
+
+        <button type="submit">Filtrar</button>
+    </form>
+
+    <!-- Lista de Productos -->
+    <div>
+        <% if (result.docs.length> 0) { %>
+            <ul>
+                <% result.docs.forEach(producto=> { %>
+                    <li id="productDetail_<%= producto._id %>" data-product-id="<%= producto._id%>">
+                        <strong>
+                            <%= producto.productTitle %>
+                        </strong>
+                        <p>Categoría: <%= producto.productCategory %>
+                        </p>
+                        <p>Precio: $<%= producto.productPrice %>
+                        </p>
+
+                        <div style="display: flex; ">
+                            <button onclick="decrementar('contador_<%= producto._id %>')">-</button>
+                            <p id="contador_<%= producto._id %>" style="margin: 0 10px; font-size: 20px;">1</p>
+                            <button onclick="incrementar('contador_<%= producto._id %>')">+</button>
+                        </div>
+                        <br>
+                        <button id="agregarCarrito_<%= producto._id %>">Agregar al carrito</button>
+                    </li>
+                    <hr>
+                    <% }); %>
+            </ul>
+
+            <!-- Controles de Paginación -->
+            <div>
+                <% if (result.hasPrevPage) { %>
+                    <a href="?page=<%= result.prevPage %>">Anterior</a>
+                    <% } %>
+
+                        Página <%= result.page %> de <%= result.totalPages %>
+
+                                <% if (result.hasNextPage) { %>
+                                    <a href="?page=<%= result.nextPage %>">Siguiente</a>
+                                    <% } %>
+            </div>
+            <% } else { %>
+                <p>No se encontraron productos.</p>
+                <% } %>
+    </div>
+
+    <script>
+        function incrementar(id) {
+            var contador = document.getElementById(id);
+            contador.textContent = parseInt(contador.textContent) + 1;
+        }
+
+        function decrementar(id) {
+            var contador = document.getElementById(id);
+            var valor = parseInt(contador.textContent);
+            if (valor > 1) {
+                contador.textContent = valor - 1;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Obtener todos los botones y contadores
+            const agregarCarritoButtons = document.querySelectorAll('[id^="agregarCarrito_"]')
+            const contadores = document.querySelectorAll('[id^="contador_"]')
+
+            // Asignar manejadores de eventos a cada botón
+            agregarCarritoButtons.forEach(button => {
+                button.addEventListener('click', function (event) {
+                    event.preventDefault()
+
+                    const pid = this.id.split('_')[1]
+                    console.log(pid)
+
+                    const quantity = document.getElementById(`contador_${pid}`).textContent
+
+                    agregarAlCarrito(pid, quantity)
+                })
+            })
+
+            //Llamar al backend
+            async function agregarAlCarrito(pid, quantity) {
+                try {
+                    const response = await fetch(`/api/carts/product/${pid}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ quantity })
+                    })
+
+                    const data = await response.json();
+
+                    if (data.result === 'success') {
+                        console.log('Producto Agregado Exitosamente');
+                    } else {
+                        console.error('Error al agregar el producto al carrito:', data.error);
+                    }
+                } catch (error) {
+                    console.error('Error de red al agregar el producto al carrito:', error)
+                }
+            }
+
+            //Boton ir al carrito
+            document.getElementById('btnCarrito').addEventListener('click', function (event) {
+                event.preventDefault()
+
+                const cid = '<%= user.cart %>'
+                console.log(cid)
+
+                obtenerCarrito(cid)
+            })
+
+            async function obtenerCarrito(cid) {
+                try {
+                    const response = await fetch(`/api/carts/${cid}`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                    })
+
+                    if (response.ok) {
+                        window.location.href = `/api/carts/${cid}`
+                        console.log("Obtencion de carrito exitosa")
+                    } else {
+                        console.error('Error al obtener su carrito')
+                    }
+                } catch (error) {
+                    console.log('Error de la red al obtener su carrito:', error)
+                }
+            }
+        })
+
+
+    </script>
+</body>
+
+</html>

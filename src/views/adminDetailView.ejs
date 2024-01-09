@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="contenedorUser" data-user-id="<%= user._id %>">
+        <h3 class="user">User: <%= user._id %>
+        </h3>
+        <p>Nombre: <%= user.first_name %>
+                <%= user.last_name %>
+        </p>
+        <p>Email: <%= user.email %>
+        </p>
+        <p>Rol: <%= user.role %>
+        </p>
+        <hr>
+        <label for="selectRol">Cambiar Rol:</label>
+        <select name="selectRol" id="selectRol">
+            <option value="user">Usuario</option>
+            <option value="premium">Usuario Premium</option>
+            <option value="admin">Administrador</option>
+        </select>
+        <button id="cambiarRol">Cambiar Rol</button>
+        <hr>
+        <button id="eliminarUsuario">Eliminar Usuario</button>
+    </div>
+
+    <script> //Lo puse aca por que poniendolo en un archivo js externo me tiraba error
+        document.addEventListener('DOMContentLoaded', function () {
+            //CAMBIAR ROL ADD EVENT
+            document.getElementById('cambiarRol').addEventListener('click', function (event) {
+                event.preventDefault();
+
+                const nuevoRol = document.getElementById('selectRol').value;
+
+                const userId = document.getElementById('contenedorUser').getAttribute('data-user-id');
+
+                cambiarRolUsuario(userId, nuevoRol);
+            });
+
+
+
+            //FUNCION CAMBIAR ROL
+            async function cambiarRolUsuario(userId, nuevoRol) {
+                try {
+                    const response = await fetch(`/api/admin/cambiarRol/${userId}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ nuevoRol })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.status === 'success') {
+                        // Recargar la página para reflejar el cambio
+                        window.location.reload();
+                        console.log('Rol de usuario cambiado con éxito');
+                    } else {
+                        console.error('Error al cambiar el rol del usuario:', data.error);
+                    }
+                } catch (error) {
+                    console.error('Error de red al cambiar el rol del usuario:', error);
+                }
+            }
+
+            //ELIMINAR USUARIO ADD EVENT
+            document.getElementById('eliminarUsuario').addEventListener('click', function (event) {
+                event.preventDefault()
+
+                const userId = document.getElementById('contenedorUser').getAttribute('data-user-id')
+                console.log(userId)
+                eliminarUsuario(userId)
+            })
+
+            //FUNCION ELIMINAR USUARIO
+            async function eliminarUsuario(userId) {
+                console.log('Eliminar usuario:', userId)
+                try {
+                    const response = await fetch(`/api/admin/${userId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                    })
+
+                    const data = await response.json()
+
+                    if (data.status === 'success') {
+                        window.location.href = '/api/admin'
+                        console.log('Usuario eliminado con éxito')
+                    } else {
+                        console.error('Error al eliminar el usuario:', data.error);
+                    }
+                } catch (error) {
+                    console.error('Error de red al eliminar el usuario:', error);
+                }
+            }
+        })    
+    </script>
+</body>
+
+</html>

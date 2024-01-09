@@ -1,0 +1,425 @@
+paths:
+  /api/products/:
+    get:
+      summary: Obtiene todos los productos
+      tags:
+        - Productos
+      responses:
+        “200”:
+          description: “Datos obtenidos satisfactoriamente”
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#components/schemas/Producto'
+        “500”:
+          description: “Error interno del servidor”
+    post:
+      summary: Crea un nuevo producto
+      tags: 
+        - Productos
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#components/requestBodies/newProduct'
+      responses:
+        “200”:
+          description: “Producto creado satisfactoriamente”
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#components/schemas/Producto'
+        “500”:
+          description: “Error interno del servidor”
+  /api/products/{pid}:
+    get:
+      summary: Obtiene solo un producto por id
+      tags:
+        - Productos
+      parameters:
+        - name: pid
+          in: path
+          required: true
+          description: id del producto que se solicita
+          schema:
+          $type: String
+      responses:
+        “200”:
+          description: "producto encontrado"
+          content:
+            application/json:
+              schema:
+                $ref: '#components/schemas/Producto'
+        “500”:
+          description: “Error interno del servidor”
+    put:
+      summary: Actualiza solo un producto por id
+      tags:
+        - Productos
+      parameters:
+        - name: pid
+          in: path
+          required: true
+          description: id del producto que se solicita
+          schema:
+            $type: String
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#components/requestBodies/newProduct'
+      responses:
+        “200”:
+          description: "producto actualizado"
+          content:
+            application/json:
+              schema:
+                $ref: '#components/schemas/Producto'
+        “500”:
+          description: “Error interno del servidor”
+    delete:
+      summary: Elimina un producto por id
+      tags:
+        - Productos
+      parameters:
+        - name: pid
+          in: path
+          required: true
+          description: id del producto que se solicita
+          schema:
+            $type: String
+      responses:
+        “200”:
+          description: "producto eliminado"
+          content:
+            application/json:
+              schema:
+                $ref: '#components/schemas/Producto'
+        “500”:
+          description: “Error interno del servidor”
+  /api/carts/:
+    post:
+      summary: Crea un carrito
+      tags:
+        - Carts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#components/requestBodies/newCart'  
+      responses:
+        “200”:
+          description: “Carrito creado correctamente”
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#components/schemas/Carrito'
+        “500”:
+          description: “Error interno del servidor”
+  /api/carts/{cid}:
+    get:
+      summary: Obtiene un carrito especifco
+      tags:
+        - Carts
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: id del carrito que se solicita
+          schema:
+          $type: String  
+      responses:
+        “200”:
+          description: “Datos obtenidos satisfactoriamente”
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#components/schemas/Carrito'
+        “500”:
+          description: “Error interno del servidor”
+    put:
+      summary: Actualiza solo un carrito por id
+      tags:
+        - Carts
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: id del carrito que se solicita
+          schema:
+            $type: String
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#components/requestBodies/newCart'
+      responses:
+        “200”:
+          description: "carrito actualizado"
+          content:
+            application/json:
+              schema:
+                $ref: '#components/schemas/Carrito'
+        “500”:
+          description: “Error interno del servidor”
+    delete:
+      summary: Eliminar el carrito seleccionado
+      tags:
+        - Carts
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: id del carrito que se solicita
+          schema:
+          $type: String  
+      responses:
+        “200”:
+          description: “Carrito eliminado correctamente”
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#components/schemas/Carrito'
+        “500”:
+          description: “Error interno del servidor”
+  /api/carts/{cid}/products/{pid}:
+    post:
+      summary: Agrega un producto al carrito
+      tags:
+        - Carts
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: id del carrito que se solicita
+          schema:
+            $type: String
+        - name: pid
+          in: path
+          required: true
+          description: id del producto que se solicita
+          schema:
+            $type: String
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#components/requestBodies/newQuantity'
+      responses:
+        “200”:
+          description: "Producto agregado al carrito correctamente"
+          content:
+            application/json:
+              schema:
+                $ref: '#components/schemas/Carrito'
+        “500”:
+          description: “Error interno del servidor”
+    put:
+      summary: Actualiza la cantidad de unidades de un producto en determinado carrito
+      tags:
+        - Carts
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: id del carrito que se solicita
+          schema:
+            $type: String
+        - name: pid
+          in: path
+          required: true
+          description: id del producto que se solicita
+          schema:
+            $type: String
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#components/requestBodies/newQuantity'
+      responses:
+        “200”:
+          description: "cantidad de unidades actualizada"
+          content:
+            application/json:
+              schema:
+                $ref: '#components/schemas/Carrito'
+        “500”:
+          description: “Error interno del servidor”
+    delete:
+      summary: Elimina un producto del carrito seleccionado
+      tags:
+        - Carts
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: id del carrito que se solicita
+          schema:
+            $type: String
+        - name: pid
+          in: path
+          required: true
+          description: id del producto que se solicita
+          schema:
+            $type: String
+      responses:
+        “200”:
+          description: "Producto eliminado del carrito correctamente"
+          content:
+            application/json:
+              schema:
+                $ref: '#components/schemas/Carrito'
+        “500”:
+          description: “Error interno del servidor”
+  /api/carts/{cid}/purchase:
+    post:
+      summary: Finaliza la compra
+      tags:
+        - Carts
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: id del carrito que se solicita
+          schema:
+          $type: String  
+      responses:
+        “200”:
+          description: “Elimina el stock de los productos comprados, envia un sms y un mail al comprador”
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#components/schemas/Carrito'
+        “500”:
+          description: “Error interno del servidor”
+  
+
+components:
+  schemas:
+    Producto:
+      type: object
+      properties:
+        _id:
+          type: ObjectId
+          description: Id generado en MongoDB
+        productTitle:
+          type: String
+          description: Nombre del producto
+        productDescription:
+          type: String
+          description: Descripcion del producto
+        productCode: 
+          type: Number
+          description: Codigo del producto
+        productPrice: 
+          type: Number
+          description: Precio del producto
+        productStatus: 
+          type: Boolean
+          description: Estado del producto
+        productStock: 
+          type: Number
+          description: Stock del producto
+        productCategory: 
+          type: String
+          description: Categoria del producto
+        productOwner: 
+          type: String
+          description: Dueño del producto
+      example: 
+        _id: ObjectId(1)
+        productTitle: Teclado
+        productDescription: Teclado inalambrico con luces led
+        productCode: 1
+        productPrice: 100
+        productStatus: true
+        productStock: 10
+        productCategory: Computacion
+        productOwner: admin
+    Carrito:
+      type: object
+      properties:
+        _id:
+          type: ObjectId
+          description: Id generado en MongoDB
+        titular:
+          type: String
+          description: Nombre del titular del carrito
+        productos: 
+          type: Array
+          description: Un array de objetos donde cada objeto es un producto del carrito
+      example:
+        _id: ObjectId(X)
+        titularCarrito: XXXX XXXX
+        productos: [{producto: X, quantity: X, _id: X}]
+  requestBodies:  
+    newProduct:
+      type: object
+      properties:
+        titulo:
+          type: String
+          description: Nombre del producto
+        description:
+          type: String
+          description: Descripcion del producto
+        code: 
+          type: Number
+          description: Codigo del producto
+        price: 
+          type: Number
+          description: Precio del producto
+        status: 
+          type: Boolean
+          description: Estado del producto
+        stock: 
+          type: Number
+          description: Stock del producto
+        category: 
+          type: String
+          description: Categoria del producto
+      example:
+        titulo: Teclado
+        description: Teclado inalambrico con luces led
+        code: 1
+        price: 100
+        status: true
+        stock: 10
+        category: Computacion
+    newCart:
+      type: object
+      properties:
+        titular:
+          type: String
+          description: Nombre del del titular del carrito
+        productos: 
+          type: Array
+          description: Un array de objetos donde cada objeto es un producto del carrito
+      example:
+        titular: XXXX XXXX
+        productos: [{producto: X, quantity: X, _id: X}]
+    newQuantity:
+      type: object
+      properties:
+        quantity:
+          type: Number
+          description: Nueva cantidad de unidades que el cliente quiere por el producto
+      example:
+        quantity: 5

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>Su compra fue realizada con exito!</h1>
+
+    <h2>Ticket de compra:</h2>
+    <p>Fecha de la compra: <%= result.purchase_datetime%>
+    </p>
+    <p>Codigo de la compra: <%= result.code%>
+    </p>
+    <p>Comprador: <%= result.purchaser%>
+    </p>
+    <p>Total: $<%= result.amount%>
+    </p>
+    <% if (result.unpurchasedProducts.length>0){%>
+        <p>Lamentablemente no teníamos stock de los siguientes productos:</p>
+        <ul>
+            <% result.unpurchasedProducts.forEach(product=> { %>
+                <li>
+                    <%= product %>
+                </li>
+                <% }); %>
+        </ul>
+        <% } %>
+</body>
+
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1 id="titulo" data-result="<%= JSON.stringify(result) %>">Carrito</h1>
+
+    <div id="contenedorCart" data-cart-id="<%= result._id %>">
+
+        <ul>
+            <% result.productos.forEach(producto=> { %>
+                <li>
+                    <strong>
+                        <%= producto.nombre %>
+                    </strong>
+                    <p>Unidades: <%= producto.quantity %>
+                    </p>
+                    <strong>
+                        Subtotal: $<%= producto.subtotal %>
+                    </strong>
+                    <button id="btnEliminarProducto_<%= producto._id %>">Eliminar producto</button>
+                </li>
+                <hr>
+                <% }); %>
+        </ul>
+
+        <div>
+            <strong>
+                Total: $<%= result.total %>
+            </strong>
+            <button id="finalizarCompra">Finalizar Compra</button>
+        </div>
+
+    </div>
+
+    <div id="contenedorNoCart">
+        <p>Tu carrito esta vacio.</p>
+        <button id="btnVolverComprar">Volver a comprar</button>
+    </div>
+
+    <style>
+        #contenedorNoCart {
+            display: none;
+        }
+
+        #contenedorCart {
+            display: none;
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            renderCarrito()
+            async function renderCarrito() {
+                const resultString = document.getElementById('titulo').getAttribute('data-result');
+
+                try {
+                    const result = JSON.parse(resultString);
+
+                    console.log(result);
+
+                    if (result.productos.length > 0) {
+                        // Mostrar el carrito si hay productos
+                        document.getElementById('contenedorCart').style.display = 'block';
+                        document.getElementById('contenedorNoCart').style.display = 'none';
+                    } else {
+                        // Ocultar el carrito si no hay productos
+                        document.getElementById('contenedorCart').style.display = 'none';
+                        document.getElementById('contenedorNoCart').style.display = 'block'
+                    }
+                } catch (error) {
+                    console.error('Error al analizar la cadena JSON:', error);
+                }
+            }
+            renderCarrito()
+
+            const eliminarDelCarritoButtons = document.querySelectorAll('[id^="btnEliminarProducto_"]')
+
+            // Asignar manejadores de eventos a cada botón
+            eliminarDelCarritoButtons.forEach(button => {
+                button.addEventListener('click', function (event) {
+                    event.preventDefault()
+
+                    const pid = this.id.split('_')[1]
+                    console.log(pid)
+
+                    const cartId = document.getElementById('contenedorCart').getAttribute('data-cart-id')
+
+                    eliminarDelCarrito(pid, cartId)
+                })
+            })
+
+            //Llamar al backend
+            async function eliminarDelCarrito(pid, cartId) {
+                try {
+                    const response = await fetch(`/api/carts/${cartId}/products/${pid}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                    })
+
+                    const data = await response.json();
+                    console.log(data)
+
+                    if (data.result === 'success') {
+                        window.location.reload();
+                        console.log('Producto Eliminado Exitosamente');
+                    } else {
+                        console.error('Error al agregar el producto al carrito:', data.error);
+                    }
+                } catch (error) {
+                    console.error('Error de RED al agregar el producto al carrito:', error)
+                }
+            }
+
+            //Boton volver a comprar
+            document.getElementById('btnVolverComprar').addEventListener('click', function (event) {
+                event.preventDefault()
+
+
+                volverAProducts()
+            })
+
+            //Funcion volver a comprar
+            async function volverAProducts() {
+                try {
+                    const response = await fetch(`/api/products`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                    })
+
+                    if (response.ok) {
+                        window.location.href = '/api/products'
+                        console.log("Vuelta a products finalizada con exito")
+                    } else {
+                        console.error('Error al volver a products')
+                    }
+                } catch (error) {
+                    console.log('Error de la RED al volver a products:', error)
+                }
+            }
+
+            //Boton finalizar compra
+            document.getElementById('finalizarCompra').addEventListener('click', function (event) {
+                event.preventDefault()
+
+                const cartId = document.getElementById('contenedorCart').getAttribute('data-cart-id')
+
+                finalizarCompra(cartId)
+            })
+
+            //Funcion finalizar compra
+            async function finalizarCompra(cartId) {
+                try {
+                    const response = await fetch(`/api/carts/${cartId}/purchase`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                    })
+
+                    console.log(response)
+                    if (response.ok) {
+                        window.location.href = response.url
+                        console.log("Compra finalizada con exito")
+                    } else {
+                        console.error('Error al finalizar su compra')
+                    }
+                } catch (error) {
+                    console.log('Error de la red al finalizar su compra:', error)
+                }
+            }
+        })
+    </script>
+</body>
+
+
+</html>
