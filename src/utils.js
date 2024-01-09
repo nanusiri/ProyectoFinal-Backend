@@ -31,6 +31,7 @@ const storage = multer.diskStorage({
 })
 export const uploader = multer({ storage })
 
+//Crear productos aleatorios
 export const generateProduct = () => {
     const newProduct = {
         titulo: faker.commerce.product(),
@@ -45,6 +46,7 @@ export const generateProduct = () => {
     return product
 }
 
+//Confirma si es admin
 export const adminAuth = (req, res, next) => {
     const user = req.session.user
     if (user.role == "admin") {
@@ -59,6 +61,7 @@ export const adminAuth = (req, res, next) => {
     }
 }
 
+//Confima si es dueño del producto o si es admin
 export const ownerAdminAuth = (req, res, next) => {
     const user = req.session.user
     if (user.role == "user") {
@@ -73,6 +76,7 @@ export const ownerAdminAuth = (req, res, next) => {
     }
 }
 
+//Confirma si es user
 export const userAuth = (req, res, next) => {
     const user = req.session.user
     if (user.role == "admin") {

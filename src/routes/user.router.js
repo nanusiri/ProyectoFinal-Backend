@@ -16,6 +16,7 @@ router.get("/login", (req, res) => {
 router.get("/api/users/logout", logout)
 
 
+//Restablecer contraseña
 router.get("/enviarMail", contraseniaOlvidada)
 
 router.post("/restablecerContrasenia/:token", cambiarContrasenia)
@@ -23,8 +24,13 @@ router.get("/restablecerContrasenia/:token", (req, res) => {
     res.render('recuperarContraseña')
 })
 
+
+
+
 router.get("/api/users/premium/:uid", cambiarRol)
 
+
+//Subir archivos
 router.post("/api/users/:uid/documents", uploader.array('file'), upload)
 router.post("/api/users/:uid/profileImage", uploader.single('profileImage'), uploadProfileImage)
 router.post("/api/users/:uid/productImage/:pid", uploader.single('productImage'), uploadProductImage)
