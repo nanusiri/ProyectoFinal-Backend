@@ -16,7 +16,7 @@ import swaggerJsdoc from 'swagger-jsdoc';
 import SwaggerUiExpress from 'swagger-ui-express';
 
 const app = express();
-const port = config.port
+const port = config.port || 8080
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
