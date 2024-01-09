@@ -127,6 +127,7 @@
                     const data = await response.json();
 
                     if (data.result === 'success') {
+                        alert('Producto agregado al carrito exitosamente!')
                         console.log('Producto Agregado Exitosamente');
                     } else {
                         console.error('Error al agregar el producto al carrito:', data.error);
